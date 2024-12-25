@@ -142,5 +142,10 @@ This project is licensed under the MIT License.
 
 ---
 
-Feel free to contribute to this repository by submitting pull requests or issues!
+Pull requests are welcomed. For major changes, please open an issue first to discuss what you would like to change. Thanks!
+
+Happy Coding!!!
+
+## Copyright
+© KAVINDU™
 
