@@ -1,5 +1,5 @@
-# Use a base image with Java runtime
-FROM openjdk:11-jre-slim
+# Use a base image with Java 17 runtime
+FROM openjdk:17-jdk-slim
 
 # Set the working directory
 WORKDIR /app
