@@ -1,0 +1,36 @@
+name: Deploy Spring Boot App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build Project
+        run: mvn clean install -DskipTests
+      - name: Login to Docker hub
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+      - name: Build Docker Image
+        run: docker build -t wicklak/formula1 .
+      - name: Publish Image to Docker Hub
+        run: docker push wicklak/formula1:latest
+  deploy:
+    needs: build
+    runs-on: [aws-ec2]
+    steps:
+      - name: Pull Image from docker hub
+        run: docker pull wicklak/formula1:latest
+      - name: Delete old Delete old container
+        run: docker rm -f formula1-container
+      - name: Run docker container
+        run: docker run -d -p 8080:8080 --name formula1-container wicklak/formula1
