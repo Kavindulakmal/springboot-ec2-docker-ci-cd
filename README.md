@@ -38,20 +38,20 @@ This repository demonstrates deploying a Spring Boot application to an AWS EC2 i
 A simple `Dockerfile` for building the Spring Boot app:
 
 ```dockerfile
-# Use an OpenJDK base image
+# Use a base image with Java 17 runtime
 FROM openjdk:17-jdk-slim
 
-# Set working directory
+# Set the working directory
 WORKDIR /app
 
-# Copy the application JAR file
-COPY target/springboot-app.jar app.jar
+# Copy the application JAR file into the container
+COPY target/springboot-example.jar springboot-example.jar
 
-# Expose the application port
+# Expose the required port
 EXPOSE 8080
 
 # Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "springboot-example.jar"]
 ```
 
 ---
@@ -69,35 +69,35 @@ on:
       - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
+  build:
+    runs-on: [ubuntu-24.04]
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout source
+        uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build Project
+        run: mvn clean install -DskipTests
+      - name: Login to Docker hub
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+      - name: Build Docker Image
+        run: docker build -t wicklak/formula1 .
+      - name: Publish Image to Docker Hub
+        run: docker push wicklak/formula1:latest
+  deploy:
+    needs: build
+    runs-on: [aws-ec2]
+    steps:
+      - name: Pull Image from docker hub
+        run: docker pull wicklak/formula1:latest
+      - name: Delete old Delete old container
+        run: docker rm -f formula1-container
+      - name: Run docker container
+        run: docker run -d -p 8080:8080 --name formula1-container wicklak/formula1
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Build Docker Image
-      run: |
-        docker build -t springboot-app .
-
-    - name: Push Docker Image to EC2
-      env:
-        HOST: ${{ secrets.AWS_EC2_HOST }}
-        USER: ${{ secrets.AWS_EC2_USER }}
-        KEY: ${{ secrets.AWS_EC2_KEY }}
-      run: |
-        scp -o StrictHostKeyChecking=no -i "$KEY" springboot-app.tar.gz $USER@$HOST:/home/$USER/
-
-    - name: Deploy on EC2
-      env:
-        HOST: ${{ secrets.AWS_EC2_HOST }}
-        USER: ${{ secrets.AWS_EC2_USER }}
-        KEY: ${{ secrets.AWS_EC2_KEY }}
-      run: |
-        ssh -o StrictHostKeyChecking=no -i "$KEY" $USER@$HOST "docker load < springboot-app.tar.gz && docker run -d -p 8080:8080 springboot-app"
 ```
 
 ---
