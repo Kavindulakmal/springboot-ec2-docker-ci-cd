@@ -12,9 +12,9 @@ This repository demonstrates deploying a Spring Boot application to an AWS EC2 i
 
 2. **GitHub Secrets**:
    Add the following secrets to your GitHub repository:
-   - `AWS_EC2_HOST`: Public IP or domain of the EC2 instance.
-   - `AWS_EC2_USER`: Username for SSH access (e.g., `ec2-user` or `ubuntu`).
-   - `AWS_EC2_KEY`: Private SSH key for accessing the EC2 instance.
+   - `DOCKER_USERNAME`: Docker Username.
+   - `DOCKER_PASSWORD`: Docker Password.
+   
 
 3. **Docker Installed Locally**: For testing Docker images before deployment.
 
