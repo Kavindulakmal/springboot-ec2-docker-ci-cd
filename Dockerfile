@@ -11,4 +11,4 @@ COPY target/springboot-example.jar springboot-example.jar
 EXPOSE 8080
 
 # Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "springboot-example.jar"]
