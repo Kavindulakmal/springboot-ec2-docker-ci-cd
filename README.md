@@ -117,8 +117,8 @@ jobs:
 
 3. Build and run the Docker image locally:
    ```bash
-   docker build -t springboot-app .
-   docker run -p 8080:8080 springboot-app
+   docker build -t wicklak/formula1 .
+   docker run -p 8080:8080 formula1
    ```
 
 4. Push changes to the `main` branch to trigger the GitHub Actions workflow and deploy to EC2.
